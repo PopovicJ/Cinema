@@ -1,0 +1,110 @@
+import java.util.Scanner;
+
+public class CinemaClass1 {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the number of rows:");
+        int numberOfRows = scanner.nextInt();
+        System.out.println("Enter the number of seats in each row:");
+        int numberOfSeats = scanner.nextInt();
+
+        String[][] seatChart = new String[numberOfRows][numberOfSeats];
+        for (int i = 0; i < numberOfRows; i++) {
+            for (int j = 0; j < numberOfSeats; j++) {
+                seatChart[i][j] = "S";
+            }
+        }
+
+        int totalSeats = numberOfRows * numberOfSeats;
+        int totalIncome = calculateTotalIncome(numberOfRows, numberOfSeats);
+        int purchasedTickets = 0;
+        int currentIncome = 0;
+
+        while (true) {
+            System.out.println("1. Show the seats");
+            System.out.println("2. Buy a ticket");
+            System.out.println("3. Statistics");
+            System.out.println("0. Exit");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 0:
+                    return;
+                case 1:
+                    printSeats(numberOfRows, numberOfSeats, seatChart);
+                    break;
+                case 2:
+                    currentIncome += buyTicket(scanner, numberOfRows, numberOfSeats, seatChart);
+                    purchasedTickets++;
+                    break;
+                case 3:
+                    printStatistics(purchasedTickets, totalSeats, currentIncome, totalIncome);
+                    break;
+            }
+        }
+    }
+    public static void printSeats(int numRows, int numSeats, String[][] seatChart) {
+        System.out.println("Cinema:");
+        System.out.print("  ");
+        for (int seat = 1; seat <= numSeats; seat++) {
+            System.out.print(seat + " ");
+        }
+        System.out.println();
+
+        for (int row = 0; row < numRows; row++) {
+            System.out.print((row + 1) + " ");
+            for (int seat = 0; seat < numSeats; seat++) {
+                System.out.print(seatChart[row][seat] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    public static int buyTicket(Scanner scanner, int numRows, int numSeats, String[][] seatChart) {
+        while (true) {
+            System.out.println("Enter a row number:");
+            int rowNumber = scanner.nextInt();
+            System.out.println("Enter a seat number in that row:");
+            int seatNumber = scanner.nextInt();
+
+            if (rowNumber < 1 || rowNumber > numRows || seatNumber < 1 || seatNumber > numSeats) {
+                System.out.println("Wrong input! Please try again.");
+                continue;
+            }
+
+            if ("B".equals(seatChart[rowNumber - 1][seatNumber - 1])) {
+                System.out.println("That ticket has already been purchased! Please choose a different seat.");
+            } else {
+                int ticketPrice = calculateTicketPrice(numRows, rowNumber);
+                System.out.println("Ticket price: $" + ticketPrice);
+                seatChart[rowNumber - 1][seatNumber - 1] = "B";
+                return ticketPrice;
+            }
+        }
+    }
+
+    public static int calculateTotalIncome(int numRows, int numberOfSeats) {
+        int totalSeats = numRows * numberOfSeats;
+        if (totalSeats <= 60) {
+            return totalSeats * 10;
+        } else {
+            int frontHalfRows = numRows / 2;
+            int backHalfRows = numRows - frontHalfRows;
+            return (frontHalfRows * numberOfSeats * 10) + (backHalfRows * numberOfSeats * 8);
+        }
+    }
+
+    public static int calculateTicketPrice(int numRows, int rowNumber) {
+        int frontHalfRows = numRows / 2;
+        return rowNumber <= frontHalfRows ? 10 : 8;
+    }
+
+    public static void printStatistics(int purchasedTickets, int totalSeats, int currentIncome, int totalIncome) {
+        float occupancyPercentage = ((float) purchasedTickets / (float) totalSeats) * 100;
+        System.out.println("Number of purchased tickets: " + purchasedTickets);
+        System.out.println("Percentage: " + String.format("%.2f", occupancyPercentage) + "%");
+        System.out.println("Current income: $" + currentIncome);
+        System.out.println("Total income: $" + totalIncome);
+    }
+
